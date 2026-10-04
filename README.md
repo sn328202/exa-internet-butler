@@ -8,6 +8,10 @@ It is meant as a starting point. Fork it, replace parts, or use it only as a ref
 
 You need Python 3.9 or later and an Exa API key from [dashboard.exa.ai](https://dashboard.exa.ai/api-keys).
 
+> **Free credits for hackathon participants:** after creating your account, [claim your free API credits here](https://dashboard.exa.ai/billing?coupon=EXA5OCT4HACK) (code **`EXA5OCT4HACK`** is applied automatically), or scan the QR code below.
+>
+> <img src="assets/free-credits-qr.png" alt="QR code for free Exa credits" width="160">
+
 ```bash
 git clone <this repo>
 cd internet-butler-starter
@@ -50,6 +54,7 @@ All the Exa usage is in one function, `exa_search()`, so it is easy to swap in t
 
 ## Useful links
 
+- Free hackathon credits (code `EXA5OCT4HACK`): https://dashboard.exa.ai/billing?coupon=EXA5OCT4HACK
 - Exa docs: https://exa.ai/docs
 - Search API reference: https://exa.ai/docs/reference/search
 - Exa demos: https://demos.exa.ai

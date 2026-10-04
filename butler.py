@@ -19,6 +19,10 @@ from pathlib import Path
 import requests
 
 EXA_SEARCH_URL = "https://api.exa.ai/search"
+
+# Free credits for hackathon participants. Redeem in the Exa dashboard.
+HACKATHON_CREDIT_CODE = "EXA5OCT4HACK"
+HACKATHON_CREDIT_URL = f"https://dashboard.exa.ai/billing?coupon={HACKATHON_CREDIT_CODE}"
 OUTPUT_DIR = Path(__file__).parent / "out"
 
 # The shape of the action package the agent prepares. Exa's deep search fills
@@ -76,7 +80,10 @@ def exa_search(payload: dict) -> dict:
     """Call the Exa search endpoint and return the JSON response."""
     api_key = os.environ.get("EXA_API_KEY")
     if not api_key:
-        sys.exit("Set EXA_API_KEY first. Get a key at https://dashboard.exa.ai/api-keys")
+        sys.exit(
+            "Set EXA_API_KEY first. Get a key at https://dashboard.exa.ai/api-keys\n"
+            f"Hackathon participants: claim free credits at {HACKATHON_CREDIT_URL}"
+        )
 
     response = requests.post(
         EXA_SEARCH_URL,
@@ -84,6 +91,11 @@ def exa_search(payload: dict) -> dict:
         json=payload,
         timeout=180,
     )
+    if response.status_code == 402:
+        sys.exit(
+            "Exa returned 402: your account is out of credits.\n"
+            f"Claim free hackathon credits at {HACKATHON_CREDIT_URL}"
+        )
     if response.status_code != 200:
         sys.exit(f"Exa returned {response.status_code}: {response.text[:500]}")
     return response.json()
