@@ -24,14 +24,22 @@ export EXA_API_KEY=your_key_here # on Windows: set EXA_API_KEY=your_key_here
 ## Run it
 
 ```bash
-python butler.py "Claim compensation for my delayed flight from Helsinki to Berlin last week"
+python butler.py "Claim EU261 compensation for my Helsinki to Berlin flight that landed 4 hours late" --country FI
 ```
 
-Add details about yourself so the draft comes back filled in:
+Add `--country` with a two-letter code so the agent looks for that country's rules and companies, and `--language` to get the draft in the local language. Add `--details` so the draft comes back filled in:
 
 ```bash
-python butler.py "Cancel my gym membership at FitLife" --details "Name: Alex Doe, member ID 12345, joined March 2025"
+python butler.py "Cancel my gym membership in Berlin" --country DE --language German \
+  --details "Name: Alex Doe, member ID 12345, joined March 2025"
 ```
+
+More errands to try:
+
+- "Return a faulty pair of headphones I bought online from a shop in the Netherlands, within the EU 14-day withdrawal period" `--country NL`
+- "Register a used car I bought in Sweden after moving it to Finland" `--country FI --language Finnish`
+- "Get a refund for a Deutsche Bahn train that arrived 90 minutes late" `--country DE`
+- "Find out how to replace a lost national ID card in Spain" `--country ES --language Spanish`
 
 The agent prints a summary, the steps, what you need, where to submit, the prepared draft, anything you still need to confirm, and the sources it used. You can then approve it, ask for changes, or discard it. Approved actions are saved to `out/`.
 

@@ -5,8 +5,9 @@ web with Exa, works out the steps, and prepares the final action (an email, a
 form's contents or a letter) for you to review and approve.
 
 Usage:
-    python butler.py "Claim compensation for my delayed flight from Helsinki to Berlin"
-    python butler.py "Cancel my gym membership" --details "Name: Alex Doe, member ID 12345"
+    python butler.py "Claim EU261 compensation for my Helsinki to Berlin flight that landed 4 hours late" --country FI
+    python butler.py "Cancel my gym membership in Berlin" --country DE --language German \
+        --details "Name: Alex Doe, member ID 12345"
 """
 
 import argparse
@@ -68,8 +69,9 @@ ACTION_SCHEMA = {
 
 SYSTEM_PROMPT = (
     "You are an internet butler. Research the user's errand using official and "
-    "reliable sources, such as company policy pages, government sites and regulator "
-    "guidance. Work out exactly what the user needs to do, then prepare the final "
+    "reliable sources, such as company policy pages, government sites, national "
+    "consumer authorities and EU rules where they apply. Sources may be in any "
+    "language. Work out exactly what the user needs to do, then prepare the final "
     "action so the user only has to review and approve it. Use only facts found in "
     "the sources. Where a detail about the user is missing, leave a clear "
     "placeholder like [BOOKING REFERENCE] and list it under open_questions."
@@ -101,16 +103,25 @@ def exa_search(payload: dict) -> dict:
     return response.json()
 
 
-def prepare_action(errand: str, details: str, notes: str = "") -> dict:
+def prepare_action(
+    errand: str,
+    details: str,
+    notes: str = "",
+    country: str = "",
+    language: str = "",
+) -> dict:
     """Research the errand and prepare an action package for approval."""
     instructions = SYSTEM_PROMPT
+    if country:
+        instructions += f"\n\nThe user lives in the country with ISO code {country.upper()}. Prefer that country's rules, authorities and companies."
+    if language:
+        instructions += f"\n\nWrite the draft in {language}. Write everything else in English."
     if details:
         instructions += f"\n\nWhat the user has told you about themselves: {details}"
     if notes:
         instructions += f"\n\nThe user reviewed an earlier draft and asked for these changes: {notes}"
 
-    data = exa_search(
-        {
+    payload = {
             "query": errand,
             "type": "deep",
             "numResults": 10,
@@ -118,7 +129,10 @@ def prepare_action(errand: str, details: str, notes: str = "") -> dict:
             "outputSchema": ACTION_SCHEMA,
             "contents": {"highlights": {"maxCharacters": 800}},
         }
-    )
+    if country:
+        # Tells Exa which country the user is searching from.
+        payload["userLocation"] = country.upper()
+    data = exa_search(payload)
 
     output = data.get("output") or {}
     content = output.get("content") or {}
@@ -197,13 +211,15 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Internet Butler starter, powered by Exa")
     parser.add_argument("errand", help="The task, in plain language")
     parser.add_argument("--details", default="", help="Facts about the user to fill into the draft")
+    parser.add_argument("--country", default="", help="Two-letter country code, such as FI, DE or FR")
+    parser.add_argument("--language", default="", help="Language for the draft, such as Finnish or German")
     parser.add_argument("--yes", action="store_true", help="Skip the approval prompt and save the result")
     args = parser.parse_args()
 
     notes = ""
     while True:
         print("Researching with Exa deep search. This can take up to a minute...")
-        package = prepare_action(args.errand, args.details, notes)
+        package = prepare_action(args.errand, args.details, notes, args.country, args.language)
         show(package)
 
         if args.yes:
