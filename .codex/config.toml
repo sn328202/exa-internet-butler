@@ -1,0 +1,9 @@
+# Codex project config for the Internet Butler starter.
+# Codex loads this only after you mark the project as trusted.
+# It connects Exa's hosted MCP server, so Codex can search the web,
+# read pages and run multi-step research while it helps you build.
+
+[mcp_servers.exa]
+url = "https://mcp.exa.ai/mcp?tools=web_search_exa,web_fetch_exa,web_search_advanced_exa,agent_run"
+# Sends your key from the EXA_API_KEY environment variable as the x-api-key header.
+env_http_headers = { "x-api-key" = "EXA_API_KEY" }

@@ -92,6 +92,28 @@ Places and Flights cover the whole world. Transit, Products, Events and Podcasts
 
 These can be combined in one agent. For example, a trip butler could check the flight schedule, then find places near the hotel, then find events during the stay.
 
+## Build with Codex
+
+The repo is set up for [Codex](https://openai.com/codex) (and works the same way with Claude Code and other coding agents).
+
+- **`AGENTS.md`** tells the coding agent how the project is organised, where the Exa calls live, and the rules to keep (approval step, sources, no keys in code). Codex reads it automatically.
+- **`.codex/config.toml`** connects Exa's hosted MCP server, so Codex can search the web, read pages and run research while it helps you build. Codex loads it once you trust the project, and it uses the same `EXA_API_KEY` as the starter.
+
+To get started:
+
+```bash
+export EXA_API_KEY=your_key_here
+codex
+```
+
+Then ask for what you want, for example:
+
+- "Add a Places lookup so the butler finds a notary that is open now near the user."
+- "When a flight is cancelled, use Flights data to suggest alternatives, then find a hotel near the airport."
+- "Restrict research to official government and company sites for the user's country."
+
+Prefer not to use the project config? Install the Exa plugin from [chatgpt.com/plugins/exa](https://chatgpt.com/plugins/exa) instead, or add the server yourself with `codex mcp add exa --url https://mcp.exa.ai/mcp` (free, rate-limited use without a key).
+
 ## Ideas for taking it further
 
 - Put a web or chat interface in front of it.
